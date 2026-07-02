@@ -1,0 +1,232 @@
+/* =========================================
+   1. 기본 레이아웃 및 캔버스 설정
+   ========================================= */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: fixed; 
+    background-color: #ffffff; 
+}
+
+canvas {
+    display: block; 
+    width: 100%;
+    height: 100%;
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================
+   2. UI 패널 공통 애니메이션 및 레이아웃
+   ========================================= */
+.ui-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  
+  width: 344px;
+  height: 650px; 
+  max-height: 90vh; 
+  
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.7) 0%, rgba(236, 254, 255, 0.7) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0px 4px 6px -4px rgba(0, 0, 0, 0.10), 0px 10px 15px -3px rgba(0, 0, 0, 0.10);
+  border-radius: 24px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  filter: blur(0px);
+
+  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              filter 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hidden {
+  opacity: 0 !important;
+  filter: blur(15px) !important;
+  transform: translate(-50%, -47%) scale(0.96) !important;
+  pointer-events: none !important;
+}
+
+.panel-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1; 
+  overflow-y: auto; 
+}
+
+/* =========================================
+   3. 민락항 패널 전용 스타일
+   ========================================= */
+.panel-header {
+  position: relative;
+  /* 💡 높이를 192px -> 130px로 줄여서 스크롤바가 생기지 않도록 여백 확보 */
+  height: 130px; 
+  flex-shrink: 0; 
+}
+
+.panel-header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 세로가 줄어들어도 이미지가 비율에 맞게 잘리도록 처리 */
+}
+
+.badge-port {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 16px;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0px 4px 6px -4px rgba(0, 0, 0, 0.10);
+  color: #005F5A;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.env-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.env-title {
+  color: #364153;
+  font-size: 14px;
+  font-weight: 500;
+  padding-left: 4px;
+}
+
+/* =========================================
+   4. 요약 패널 전용 스타일 (날짜 및 여백)
+   ========================================= */
+.date-section {
+  margin-bottom: 24px; 
+}
+
+.date-badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #E5E7EB;
+}
+
+.date-icon {
+  width: 15px;
+  height: 15px;
+  outline: 1.67px solid #99A1AF;
+  outline-offset: -0.83px;
+}
+
+.date-badge span {
+  color: #364153;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.stat-cards-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* =========================================
+   5. 통계 카드 공통 스타일
+   ========================================= */
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.stat-title {
+  color: #4A5565;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17.5px;
+}
+
+.stat-value-group {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between; 
+}
+
+.stat-number.primary-color {
+  color: #00786F;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.stat-number.dark-color { 
+  color: #101828;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.stat-unit {
+  color: #4A5565;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.stat-date {
+  color: #4A5565;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* =========================================
+   6. 닫기 버튼 공통 스타일
+   ========================================= */
+.close-button {
+  margin: auto 20px 20px 20px;
+  padding: 14px;
+  background-color: #364153;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0; 
+}
+
+.close-button:hover {
+  background-color: #1f2937;
+}

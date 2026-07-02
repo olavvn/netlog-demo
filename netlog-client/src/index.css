@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+* {
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* react-calendar 기본 레이아웃 */
+.netlog-calendar {
+  width: 100% !important;
+  border: none !important;
+  background: white;
+}
+
+.netlog-calendar button {
+  margin: 0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+/* 네비게이션 */
+.netlog-calendar .react-calendar__navigation {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  height: 44px;
+}
+
+.netlog-calendar .react-calendar__navigation button {
+  background: none;
+  font-size: 20px;
+  color: #6b7280;
+  padding: 0 8px;
+  min-width: 44px;
+}
+
+.netlog-calendar .react-calendar__navigation__label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  text-align: left;
+  flex-grow: 1;
+  pointer-events: none;
+}
+
+.netlog-calendar .react-calendar__navigation button:enabled:hover,
+.netlog-calendar .react-calendar__navigation button:enabled:focus {
+  background: none;
+}
+
+/* 요일 헤더 */
+.netlog-calendar .react-calendar__month-view__weekdays {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.netlog-calendar .react-calendar__month-view__weekdays__weekday {
+  padding: 4px 0;
+}
+
+.netlog-calendar .react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
+/* 날짜 그리드 */
+.netlog-calendar .react-calendar__month-view__days {
+  display: flex !important;
+  flex-wrap: wrap;
+}
+
+/* 개별 타일 */
+.netlog-calendar .react-calendar__tile {
+  flex: 0 0 14.2857%;
+  max-width: 14.2857%;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #374151;
+  background: none;
+  border-radius: 0;
+  text-align: center;
+  line-height: 1;
+}
+
+.netlog-calendar .react-calendar__tile:enabled:hover {
+  background: #0055FF;
+  color: white;
+  border-radius: 999px;
+}
+
+/* 오늘 */
+.netlog-calendar .react-calendar__tile--now {
+  background: none;
+  color: #374151;
+  font-weight: bold;
+}
+
+/* 범위 중간 날짜 */
+.netlog-calendar .react-calendar__tile--range {
+  background: #0055FF;
+  color: white;
+  border-radius: 0;
+}
+
+/* 시작 날짜 */
+.netlog-calendar .react-calendar__tile--rangeStart {
+  background: #0055FF !important;
+  color: white !important;
+  border-radius: 999px 0 0 999px !important;
+}
+
+/* 끝 날짜 */
+.netlog-calendar .react-calendar__tile--rangeEnd {
+  background: #0055FF !important;
+  color: white !important;
+  border-radius: 0 999px 999px 0 !important;
+}
+
+/* 하루만 선택 */
+.netlog-calendar .react-calendar__tile--rangeStart.react-calendar__tile--rangeEnd {
+  border-radius: 999px !important;
+}
+
+/* active (기본 스타일 제거) */
+.netlog-calendar .react-calendar__tile--active {
+  background: #0055FF;
+  color: white;
+}
+
+/* 이전/다음 달 날짜 */
+.netlog-calendar .react-calendar__month-view__days__day--neighboringMonth {
+  color: #d1d5db;
+}
+
+.netlog-calendar .react-calendar__month-view__days__day--neighboringMonth.react-calendar__tile--range {
+  background: none;
+  color: #d1d5db;
+}

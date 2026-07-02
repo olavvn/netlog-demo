@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>my-three-app</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="webgl-canvas"></canvas>
+      
+      <div id="ui-panel-minrak" class="ui-panel hidden">
+        <div class="panel-header">
+          <img src="https://placehold.co/344x192" alt="민락항 배경" />
+          <div class="badge-port">민락항</div>
+        </div>
+        
+        <div class="panel-body">
+          <div class="stat-card">
+            <div class="stat-title">누적 수거량</div>
+            <div class="stat-value-group">
+              <span class="stat-number primary-color">1,250</span>
+              <span class="stat-unit">kg</span>
+            </div>
+            <div class="stat-date">마지막 수거일: 2026년 6월 1일</div>
+          </div>
+          
+          <div class="env-section">
+            <div class="env-title">환경지표</div>
+            <div class="stat-card">
+              <div class="stat-title">이산화탄소 감축량</div>
+              <div class="stat-value-group">
+                <span class="stat-number dark-color">3,400</span>
+                <span class="stat-unit">kg</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">스마트폰 완충 횟수</div>
+              <div class="stat-value-group">
+                <span class="stat-number dark-color">450,000</span>
+                <span class="stat-unit">회</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="close-button">닫기</button>
+      </div>
+
+      <div id="ui-panel-summary" class="ui-panel hidden">
+        <div class="panel-body">
+          
+          <div class="date-section">
+            <div class="date-badge">
+              <div class="date-icon"></div>
+              <span>2026년 5월 6일 - 2026년 6월 6일</span>
+              <div class="date-icon"></div>
+            </div>
+          </div>
+
+          <div class="stat-cards-wrapper">
+            <div class="stat-card">
+              <div class="stat-title">누적 폐어망 수거량</div>
+              <div class="stat-value-group">
+                <span class="stat-number dark-color">1,250</span>
+                <span class="stat-unit">kg</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-title">누적 이산화탄소 감축량</div>
+              <div class="stat-value-group">
+                <span class="stat-number dark-color">3,400</span>
+                <span class="stat-unit">kg</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-title">누적 스마트폰 완충 횟수</div>
+              <div class="stat-value-group">
+                <span class="stat-number dark-color">450,000</span>
+                <span class="stat-unit">회</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-title">소나무 1그루가 흡수하는 데 걸리는 기간</div>
+              <div class="stat-value-group">
+                <span class="stat-number dark-color">12</span>
+                <span class="stat-unit">개월</span>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <button class="close-button">닫기</button>
+      </div>
+      
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
