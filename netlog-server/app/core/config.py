@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     cloudinary_cloud_name: str
     cloudinary_api_key: str
     cloudinary_api_secret: str
+    environment: str = "production" # production | development
+    cors_origins: str = "http://localhost:5173,https://netlog-client.vercel.app"
 
     class Config:
         env_file = ".env"

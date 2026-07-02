@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from app.core.config import settings
 from app.routers import auth, collection, dashboard, map
 from app import models
 from app.database import get_db
@@ -9,10 +10,7 @@ app = FastAPI(title="NETLOG API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://netlog-client.vercel.app" # 배포 주소
-    ],
+    allow_origins=[origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,6 +27,9 @@ def health_check():
 
 @app.post("/dev/seed")
 def seed(db: Session = Depends(get_db)):
+    if settings.environment != "development":
+        raise HTTPException(status_code=404)
+
     from app.core.security import hash_password
     from sqlalchemy import text
 
