@@ -6,7 +6,10 @@ COPY netlog-client/package*.json ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
 COPY netlog-client/ ./
 
-ARG VITE_API_URL=http://localhost:8080
+# Empty = same-origin/relative requests, proxied to the api container by
+# nginx.conf (see the /auth|inspection|dashboard|map location block below).
+# Only override this if the api is NOT reachable via this nginx's proxy.
+ARG VITE_API_URL=""
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
