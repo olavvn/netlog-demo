@@ -1,0 +1,11 @@
+FROM docker.io/library/postgres:16-alpine
+
+# Default credentials for lab/dev use — override with `-e` at `podman run` time for real deployments.
+ENV POSTGRES_USER=netlog \
+    POSTGRES_PASSWORD=netlog \
+    POSTGRES_DB=netlog
+
+# No schema.sql baked in on purpose: the app schema is version-managed via Alembic
+# (see netlog-db/migrations), so a fresh DB is initialized by running the
+# separate netlog-db migration image (Containerfile.migrate / netlog-db/Containerfile)
+# against this container, not by an initdb.d script.
