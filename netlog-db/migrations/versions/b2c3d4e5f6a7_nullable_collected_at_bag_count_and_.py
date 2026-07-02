@@ -79,6 +79,7 @@ def upgrade() -> None:
     $$;
     """)
 
+    op.execute("DROP TRIGGER IF EXISTS trg_enforce_status_transition ON collection_record;")
     op.execute("""
     CREATE TRIGGER trg_enforce_status_transition
     BEFORE UPDATE OF status ON collection_record

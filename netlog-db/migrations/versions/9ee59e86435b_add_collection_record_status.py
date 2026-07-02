@@ -35,8 +35,12 @@ def upgrade() -> None:
 
     # 2. Add status column to collection_record
     op.execute("""
-    ALTER TABLE collection_record
-    ADD COLUMN status collection_record_status NOT NULL DEFAULT 'in_progress';
+    DO $$ BEGIN
+        ALTER TABLE collection_record
+        ADD COLUMN status collection_record_status NOT NULL DEFAULT 'in_progress';
+    EXCEPTION
+        WHEN duplicate_column THEN null;
+    END $$;
     """)
 
     # 3. Create bundle_status type (if not exists)

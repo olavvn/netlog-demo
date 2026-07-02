@@ -40,7 +40,17 @@ def upgrade() -> None:
     # ------------------------------------------------------------------ #
     # 2. Drop old triggers that reference soon-to-be-dropped tables       #
     # ------------------------------------------------------------------ #
-    op.execute("DROP TRIGGER IF EXISTS trg_fill_expected_bag_count ON collection_plan_site;")
+    # collection_plan_site may not exist at all (e.g. a fresh DB bootstrapped
+    # from sql/schema.sql, which never created it), so guard against
+    # "relation does not exist" -- DROP TRIGGER ... ON errors on a missing
+    # table even with IF EXISTS on the trigger itself.
+    op.execute("""
+    DO $$ BEGIN
+        DROP TRIGGER IF EXISTS trg_fill_expected_bag_count ON collection_plan_site;
+    EXCEPTION
+        WHEN undefined_table THEN null;
+    END $$;
+    """)
     op.execute("DROP FUNCTION IF EXISTS fn_fill_expected_bag_count();")
 
     # Replace FIFO dequeue (on collection_site_detail) with status-based approach
@@ -56,20 +66,23 @@ def upgrade() -> None:
     # ------------------------------------------------------------------ #
     # 4. Add planned_at to collection_record                              #
     # ------------------------------------------------------------------ #
-    op.add_column(
-        'collection_record',
-        sa.Column('planned_at', sa.TIMESTAMP(timezone=True), nullable=True)
-    )
+    op.execute("""
+    DO $$ BEGIN
+        ALTER TABLE collection_record ADD COLUMN planned_at TIMESTAMPTZ;
+    EXCEPTION
+        WHEN duplicate_column THEN null;
+    END $$;
+    """)
 
     # ------------------------------------------------------------------ #
     # 5. Drop collection_plan_site then collection_plan + plan_status      #
     # ------------------------------------------------------------------ #
-    op.execute("ALTER TABLE collection_plan_site DROP CONSTRAINT IF EXISTS fk_collection_plan_site_plan;")
-    op.execute("ALTER TABLE collection_plan_site DROP CONSTRAINT IF EXISTS fk_collection_plan_site_site;")
-    op.drop_table('collection_plan_site')
+    op.execute("ALTER TABLE IF EXISTS collection_plan_site DROP CONSTRAINT IF EXISTS fk_collection_plan_site_plan;")
+    op.execute("ALTER TABLE IF EXISTS collection_plan_site DROP CONSTRAINT IF EXISTS fk_collection_plan_site_site;")
+    op.execute("DROP TABLE IF EXISTS collection_plan_site;")
 
-    op.execute("ALTER TABLE collection_plan DROP CONSTRAINT IF EXISTS fk_collection_plan_manager;")
-    op.drop_table('collection_plan')
+    op.execute("ALTER TABLE IF EXISTS collection_plan DROP CONSTRAINT IF EXISTS fk_collection_plan_manager;")
+    op.execute("DROP TABLE IF EXISTS collection_plan;")
 
     op.execute("DROP TYPE IF EXISTS plan_status;")
 
@@ -91,6 +104,7 @@ def upgrade() -> None:
     $$;
     """)
 
+    op.execute("DROP TRIGGER IF EXISTS trg_fill_bag_count_from_queue ON collection_site_detail;")
     op.execute("""
     CREATE TRIGGER trg_fill_bag_count_from_queue
     BEFORE INSERT ON collection_site_detail
@@ -134,6 +148,7 @@ def upgrade() -> None:
     $$;
     """)
 
+    op.execute("DROP TRIGGER IF EXISTS trg_zero_queue_on_completed ON collection_record;")
     op.execute("""
     CREATE TRIGGER trg_zero_queue_on_completed
     AFTER UPDATE OF status ON collection_record

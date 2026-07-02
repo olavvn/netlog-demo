@@ -20,7 +20,13 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Add actual_bag_count column to collection_site_detail table
-    op.add_column('collection_site_detail', sa.Column('actual_bag_count', sa.Integer(), nullable=True))
+    op.execute("""
+    DO $$ BEGIN
+        ALTER TABLE collection_site_detail ADD COLUMN actual_bag_count INTEGER;
+    EXCEPTION
+        WHEN duplicate_column THEN null;
+    END $$;
+    """)
 
 
 def downgrade() -> None:

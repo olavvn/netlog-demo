@@ -20,12 +20,21 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # 1. Add weight_kg column to collection_site_detail table with CHECK constraint
-    op.add_column('collection_site_detail', sa.Column('weight_kg', sa.Numeric(precision=10, scale=2), nullable=True))
-    op.create_check_constraint(
-        'chk_detail_weight_pos',
-        'collection_site_detail',
-        'weight_kg IS NULL OR weight_kg > 0'
-    )
+    op.execute("""
+    DO $$ BEGIN
+        ALTER TABLE collection_site_detail ADD COLUMN weight_kg NUMERIC(10, 2);
+    EXCEPTION
+        WHEN duplicate_column THEN null;
+    END $$;
+    """)
+    op.execute("""
+    DO $$ BEGIN
+        ALTER TABLE collection_site_detail
+        ADD CONSTRAINT chk_detail_weight_pos CHECK (weight_kg IS NULL OR weight_kg > 0);
+    EXCEPTION
+        WHEN duplicate_object THEN null;
+    END $$;
+    """)
     
     # 2. Create trigger function and trigger to auto-calculate total weight
     op.execute("""
@@ -47,6 +56,7 @@ def upgrade() -> None:
     $$ LANGUAGE plpgsql;
     """)
     
+    op.execute("DROP TRIGGER IF EXISTS trg_update_collection_total_weight ON collection_site_detail;")
     op.execute("""
     CREATE TRIGGER trg_update_collection_total_weight
     AFTER INSERT OR UPDATE OF weight_kg OR DELETE ON collection_site_detail
