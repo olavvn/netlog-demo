@@ -2,9 +2,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import MapPage from './pages/MapPage'
 import CheckerLoginPage from './pages/CheckerLoginPage'
+import CheckerSignupPage from './pages/CheckerSignupPage'
 import CheckerPage from './pages/CheckerPage'
 import CompletePage from './pages/CompletePage'
 import DashboardLoginPage from './pages/DashboardLoginPage'
+import DashboardSignupPage from './pages/DashboardSignupPage'
 import DashboardPage from './pages/DashboardPage'
 import CollectionsPage from './pages/CollectionsPage'
 import CollectionStep1Page from './pages/CollectionStep1Page'
@@ -25,6 +27,7 @@ function App() {
 
         {/* 검수자 */}
         <Route path="/checker/login" element={<CheckerLoginPage />} />
+        <Route path="/checker/signup" element={<CheckerSignupPage />} />
         <Route path="/checker" element={
           <ProtectedRoute role="checker"><CheckerPage /></ProtectedRoute>
         } />
@@ -34,6 +37,7 @@ function App() {
 
         {/* 관리자 */}
         <Route path="/dashboard/login" element={<DashboardLoginPage />} />
+        <Route path="/dashboard/signup" element={<DashboardSignupPage />} />
         <Route path="/dashboard" element={
           <ProtectedRoute role="admin"><DashboardPage /></ProtectedRoute>
         } />

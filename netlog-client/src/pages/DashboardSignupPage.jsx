@@ -1,68 +1,80 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../api/axiosInstance'
 import logo from '../assets/logo.svg'
 
-export default function DashboardLoginPage() {
+export default function DashboardSignupPage() {
   const navigate = useNavigate()
+  const [name, setName] = useState('')
   const [loginId, setLoginId] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('operator') // 기본값 operator
   const [showPw, setShowPw] = useState(false)
-  const [keepLogin, setKeepLogin] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = async () => {
-    if (!loginId || !password) {
-      setError('아이디와 비밀번호를 입력해주세요')
+  const handleSignup = async () => {
+    if (!name || !loginId || !password) {
+      setError('이름, 아이디, 비밀번호를 모두 입력해주세요')
       return
     }
     setLoading(true)
     setError('')
     try {
-      const res = await axiosInstance.post('/auth/manager/login', {
+      await axiosInstance.post('/auth/manager/signup', {
+        name,
         login_id: loginId,
-        password: password,
+        password,
+        role,
       })
-      const { access_token, manager_id, name, role } = res.data.data
-      localStorage.setItem('admin_token', access_token)
-      localStorage.setItem('manager_id', manager_id)
-      localStorage.setItem('manager_name', name)
-      localStorage.setItem('manager_role', role)
-      navigate('/dashboard')
-    } catch {
-      setError('아이디 또는 비밀번호가 올바르지 않습니다')
+      alert('관리자 계정 등록이 완료되었습니다. 로그인 화면으로 이동합니다.')
+      navigate('/dashboard/login')
+    } catch (err) {
+      setError(err.response?.data?.message || '등록 중 오류가 발생했습니다. 아이디 중복을 확인해주세요.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-8"
+    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-8"
       style={{ background: 'linear-gradient(160deg, #4A90E2 0%, #1A4FC4 100%)' }}
     >
       {/* 로고 */}
-      <div className="mb-16">
+      <div className="mb-10 text-center">
         <img
           src={logo}
           alt="NETLOG"
-          className="h-12 object-contain"
+          className="h-12 mx-auto object-contain"
           onError={e => { e.target.style.display = 'none' }}
         />
+        <h1 className="text-white text-2xl font-bold text-center mt-2">
+          관리자 계정 생성 (회원가입)
+        </h1>
       </div>
 
-      {/* 폼 */}
-      <div className="w-full max-w-sm flex flex-col gap-8">
+      {/* 폼 카드 */}
+      <div className="w-full max-w-sm flex flex-col gap-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
+        
+        {/* 이름 */}
+        <div className="flex flex-col gap-2">
+          <label className="text-white text-sm font-medium">이름</label>
+          <input
+            className="bg-transparent border-b border-white/50 text-white text-base py-2 outline-none placeholder:text-white/30 focus:border-white transition-colors"
+            placeholder="이름을 입력하세요"
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
+        </div>
 
         {/* 아이디 */}
         <div className="flex flex-col gap-2">
           <label className="text-white text-sm font-medium">아이디</label>
           <input
             className="bg-transparent border-b border-white/50 text-white text-base py-2 outline-none placeholder:text-white/30 focus:border-white transition-colors"
-            placeholder=""
+            placeholder="아이디를 입력하세요"
             value={loginId}
             onChange={e => setLoginId(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleLogin()}
           />
         </div>
 
@@ -73,10 +85,9 @@ export default function DashboardLoginPage() {
             <input
               className="w-full bg-transparent border-b border-white/50 text-white text-base py-2 outline-none placeholder:text-white/30 focus:border-white transition-colors pr-8"
               type={showPw ? 'text' : 'password'}
-              placeholder=""
+              placeholder="비밀번호를 입력하세요"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleLogin()}
             />
             <button
               className="absolute right-0 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
@@ -97,50 +108,42 @@ export default function DashboardLoginPage() {
           </div>
         </div>
 
-        {/* 로그인 상태 유지 */}
-        <div className="flex items-center gap-2">
-          <input
-            id="keep-login"
-            type="checkbox"
-            checked={keepLogin}
-            onChange={e => setKeepLogin(e.target.checked)}
-            className="w-4 h-4 rounded border-white/50 bg-transparent accent-white cursor-pointer"
-          />
-          <label htmlFor="keep-login" className="text-white/80 text-sm cursor-pointer">
-            로그인 상태 유지
-          </label>
+        {/* 역할 선택 */}
+        <div className="flex flex-col gap-2">
+          <label className="text-white text-sm font-medium">권한 역할 (Role)</label>
+          <select
+            value={role}
+            onChange={e => setRole(e.target.value)}
+            className="w-full bg-blue-700/60 border border-white/30 text-white text-base py-2 px-3 rounded-xl outline-none focus:border-white transition-colors cursor-pointer"
+          >
+            <option className="bg-blue-800 text-white" value="operator">Operator (운영팀)</option>
+            <option className="bg-blue-800 text-white" value="admin">Admin (최고 관리자)</option>
+          </select>
         </div>
 
         {/* 에러 */}
         {error && (
-          <p className="text-red-300 text-sm text-center -mt-4">{error}</p>
+          <p className="text-red-300 text-sm text-center mt-2">{error}</p>
         )}
 
-        {/* 로그인 버튼 */}
-        <button
-          className="w-full py-4 rounded-2xl bg-white text-blue-600 font-bold text-base active:scale-95 transition-transform disabled:opacity-60"
-          onClick={handleLogin}
-          disabled={loading}
-        >
-          {loading ? '로그인 중...' : '로그인'}
-        </button>
-
-        {/* 회원가입 링크 */}
-        <p className="text-white/60 text-sm text-center -mt-2">
-          계정이 없으신가요?{' '}
-          <Link to="/dashboard/signup" className="text-white underline underline-offset-2 hover:text-blue-100 transition-colors">
-            관리자 계정 생성 (회원가입)
-          </Link>
-        </p>
+        {/* 가입 버튼 */}
+        <div className="flex flex-col gap-2 mt-4">
+          <button
+            className="w-full py-3.5 rounded-2xl bg-white text-blue-600 font-bold text-base active:scale-95 transition-transform disabled:opacity-60"
+            onClick={handleSignup}
+            disabled={loading}
+          >
+            {loading ? '가입 중...' : '계정 생성 완료'}
+          </button>
+          <button
+            className="w-full py-3.5 rounded-2xl bg-white/20 text-white font-bold text-base hover:bg-white/30 active:scale-95 transition-all"
+            onClick={() => navigate('/dashboard/login')}
+            disabled={loading}
+          >
+            취소 및 돌아가기
+          </button>
+        </div>
       </div>
-
-      {/* 하단 */}
-      <p className="mt-16 text-white/50 text-sm">
-        접근 권한이 없으신가요?{' '}
-        <a href="mailto:forsea@netlog.kr" className="text-white underline underline-offset-2">
-          관리자에게 문의하기
-        </a>
-      </p>
     </div>
   )
 }

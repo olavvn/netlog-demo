@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import axiosInstance from '../api/axiosInstance'
 import logo from '../assets/logo.png'
 
@@ -97,6 +97,14 @@ export default function CheckerLoginPage() {
         >
           {loading ? '로그인 중...' : '로그인'}
         </button>
+
+        {/* 회원가입 링크 */}
+        <p className="text-white/60 text-sm text-center mt-4">
+          처음이신가요?{' '}
+          <Link to="/checker/signup" className="text-white underline underline-offset-2 hover:text-blue-100 transition-colors">
+            집하장 등록 (회원가입)
+          </Link>
+        </p>
       </div>
     </div>
   )

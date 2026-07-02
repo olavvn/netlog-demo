@@ -1,9 +1,10 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.database import get_db
-from app.core.security import verify_password, create_access_token
+from app.core.security import verify_password, create_access_token, hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -15,6 +16,21 @@ class SiteLoginRequest(BaseModel):
 class ManagerLoginRequest(BaseModel):
     login_id: str
     password: str
+
+class ManagerSignupRequest(BaseModel):
+    name: str
+    login_id: str
+    password: str
+    role: str = "operator" # admin or operator
+
+class SiteSignupRequest(BaseModel):
+    site_code: str
+    name: str
+    region: str
+    address: str | None = None
+    latitude: float
+    longitude: float
+    pin: str
 
 # ── 응답 헬퍼 ──
 def success_response(code: int, message: str, data: dict):
@@ -89,4 +105,88 @@ def manager_login(request: ManagerLoginRequest, db: Session = Depends(get_db)):
         "manager_id": str(result.manager_id),
         "name": result.name,
         "role": result.role
+    })
+
+
+# ── 넷스파 관리자 회원가입 ──
+@router.post("/manager/signup")
+def manager_signup(request: ManagerSignupRequest, db: Session = Depends(get_db)):
+    # 중복 체크
+    dup = db.execute(
+        text("SELECT 1 FROM netspa_manager WHERE login_id = :id"),
+        {"id": request.login_id}
+    ).fetchone()
+    
+    if dup:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_response(400, "이미 존재하는 아이디입니다")
+        )
+    
+    pw_hash = hash_password(request.password)
+    manager_id = str(uuid.uuid4())
+    
+    db.execute(
+        text("""
+            INSERT INTO netspa_manager (manager_id, name, login_id, role, password_hash, created_at)
+            VALUES (:manager_id, :name, :id, :role, :pw_hash, NOW())
+        """),
+        {
+            "manager_id": manager_id,
+            "name": request.name,
+            "id": request.login_id,
+            "role": request.role,
+            "pw_hash": pw_hash
+        }
+    )
+    db.commit()
+    
+    return success_response(201, "회원가입 성공", {
+        "manager_id": manager_id,
+        "name": request.name,
+        "login_id": request.login_id,
+        "role": request.role
+    })
+
+
+# ── 집하장 검수자 회원가입 ──
+@router.post("/site/signup")
+def site_signup(request: SiteSignupRequest, db: Session = Depends(get_db)):
+    # 중복 체크
+    dup = db.execute(
+        text("SELECT 1 FROM site WHERE site_code = :code"),
+        {"code": request.site_code}
+    ).fetchone()
+    
+    if dup:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_response(400, "이미 존재하는 집하장 코드입니다")
+        )
+    
+    pin_hash = hash_password(request.pin)
+    site_id = str(uuid.uuid4())
+    
+    db.execute(
+        text("""
+            INSERT INTO site (site_id, site_code, name, region, address, latitude, longitude, pin_hash, created_at)
+            VALUES (:site_id, :code, :name, :region, :address, :lat, :lng, :pin_hash, NOW())
+        """),
+        {
+            "site_id": site_id,
+            "code": request.site_code,
+            "name": request.name,
+            "region": request.region,
+            "address": request.address,
+            "lat": request.latitude,
+            "lng": request.longitude,
+            "pin_hash": pin_hash
+        }
+    )
+    db.commit()
+    
+    return success_response(201, "회원가입 성공", {
+        "site_id": site_id,
+        "site_code": request.site_code,
+        "name": request.name
     })
