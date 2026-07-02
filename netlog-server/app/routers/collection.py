@@ -2,14 +2,13 @@ import io
 from datetime import date
 
 # [추가] Query: GET 파라미터 선언에 사용, StreamingResponse: 파일 스트리밍 응답에 사용
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Form, Query, status
 from fastapi.responses import StreamingResponse
 
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.database import get_db
 from app.core.security import verify_token
-from app.services.cloudinary_service import upload_image
 
 # [추가] Excel export 기능을 담당하는 서비스 함수 import (신규 파일: app/services/excel_service.py)
 from app.services.excel_service import generate_inspection_excel
@@ -43,7 +42,6 @@ def get_current_site(
 def create_inspection_record(
     vessel_name: str = Form(...),
     bag_count: int = Form(...),
-    image: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_site: dict = Depends(get_current_site)
 ):
@@ -69,24 +67,18 @@ def create_inspection_record(
 
     vessel_id = vessel.vessel_id
 
-    # 2. 사진 Cloudinary 업로드
-    # 업로드된 이미지는 Cloudinary의 "netlog/inspection" 폴더에 저장되고 URL을 반환받는다.
-    file_bytes = image.file.read()
-    image_url = upload_image(file_bytes, folder="netlog/inspection")
-
-    # 3. 입고 기록 INSERT
+    # 2. 입고 기록 INSERT
     record = db.execute(
         text("""
             INSERT INTO inspection_record
-                (site_id, vessel_id, bag_image_url, bag_count)
+                (site_id, vessel_id, bag_count)
             VALUES
-                (:site_id, :vessel_id, :image_url, :bag_count)
+                (:site_id, :vessel_id, :bag_count)
             RETURNING record_id, inspected_at
         """),
         {
             "site_id": site_id,
             "vessel_id": str(vessel_id),
-            "image_url": image_url,
             "bag_count": bag_count
         }
     ).fetchone()
@@ -116,7 +108,6 @@ def create_inspection_record(
             "vessel_id": str(vessel_id),
             "vessel_name": vessel_name,
             "bag_count": bag_count,
-            "bag_image_url": image_url,
             "inspected_at": record.inspected_at.isoformat(),
             "total_remaining_bag_count": int(total_remaining)
         }

@@ -5,11 +5,8 @@ class Settings(BaseSettings):
     database_url: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 180 # 로그인 토큰이 3시간 후에 만료
-    cloudinary_cloud_name: str = ""
-    cloudinary_api_key: str = ""
-    cloudinary_api_secret: str = ""
     environment: str = "production" # production | development
-    cors_origins: str = "http://localhost:5173,https://netlog-client.vercel.app"
+    cors_origins: str = "http://localhost:5173"
 
     class Config:
         env_file = ".env"

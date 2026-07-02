@@ -143,7 +143,7 @@
 | **record_id** | UUID | ✅ | `PRIMARY KEY`<br>`DEFAULT gen_random_uuid()` | 검수 건 고유 식별자 |
 | **site_id** | UUID | ✅ | `FOREIGN KEY` → `site` | 검수가 수행된 거점 ID |
 | **vessel_id** | UUID | ✅ | `FOREIGN KEY` → `vessel` | 어망을 반입한 선박 ID |
-| **bag_image_url** | TEXT | ✅ | - | 어망 마대자루를 현장에서 실사 촬영한 Cloudinary 이미지 스토리지 URL |
+| **bag_image_url** | TEXT | ❌ | - | (사진 업로드 기능 폐지로 더 이상 사용되지 않음, 항상 NULL) |
 | **bag_count** | INT | ✅ | `CHECK (bag_count > 0)` | 검수된 마대자루의 총 수량. 양수값만 허용. |
 | **is_collected** | BOOLEAN | ✅ | `DEFAULT FALSE` | **[안전장치]** 수거 완료 시 자동 갱신되는 원본 수거 상태 플래그 |
 | **inspected_at** | TIMESTAMPTZ | ✅ | `DEFAULT now()` | 실제 검수가 시행된 기록 시각 |
@@ -164,7 +164,7 @@
 | **record_id** | UUID | ✅ | `FOREIGN KEY` → `inspection_record` | 해당 재고의 원천이 되는 검수 건 ID |
 | **original_bag_count** | INT | ✅ | - | 검수 당시 반입된 최초 마대 수량 |
 | **remaining_bag_count** | INT | ✅ | `CHECK (remaining_bag_count >= 0)` | 수거 후 아직 남아 있는 실시간 미수거 마대 수량. |
-| **bag_image_url** | TEXT | ✅ | - | 대시보드나 상세 보기에서 원본 사진을 빠르게 조회하기 위해 복사 저장된 URL |
+| **bag_image_url** | TEXT | ❌ | - | (사진 업로드 기능 폐지로 더 이상 사용되지 않음, 항상 NULL) |
 | **queued_at** | TIMESTAMPTZ | ✅ | - | FIFO 차감의 기준선 정렬용 타임스탬프. 원천 `inspection_record.inspected_at` 값이 동일하게 주입됩니다. |
 | **is_fully_collected** | BOOLEAN | ✅ | `DEFAULT FALSE` | 전량 수거가 완결(`remaining_bag_count = 0`)되었는지의 여부 |
 
@@ -307,7 +307,7 @@
 |:---|:---|:---:|:---|:---|
 | **archive_id** | UUID | ✅ | `PRIMARY KEY`<br>`DEFAULT gen_random_uuid()` | 아카이브 레코드 고유 ID |
 | **year_month** | CHAR(7) | ✅ | `UNIQUE` | 집계 기준 월 지정 포맷 (예: '2025-06'). 중복 생성 원천 차단. |
-| **collage_url** | TEXT | ❌ | - | 당월에 축적된 거점별 수거 사진들을 Pillow 라이브러리로 하나의 타일식 이미지로 합성한 뒤 Cloudinary에 올린 웹 주소 URL |
+| **collage_url** | TEXT | ❌ | - | (Phase 2 설계 당시 구상안, 현재 사진 업로드 기능 자체가 폐지되어 미사용) |
 | **total_bag_count** | BIGINT | ❌ | - | 해당 월 전체를 통틀어 집하장에 반입·검수 완료된 전체 마대 수량 합산 |
 | **total_weight_kg** | NUMERIC(12,2) | ❌ | - | 해당 월에 완료된 누적 계근 수거 무게의 총합(kg) |
 | **active_site_count** | INT | ❌ | - | 해당 월 범위 동안 검수 또는 수거 실적이 발생한 활성 집하장의 순수 개수 |

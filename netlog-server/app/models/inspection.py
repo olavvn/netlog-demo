@@ -10,6 +10,6 @@ class InspectionRecord(Base):
     record_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     site_id = Column(UUID(as_uuid=True), ForeignKey("site.site_id"), nullable=False)
     vessel_id = Column(UUID(as_uuid=True), ForeignKey("vessel.vessel_id"), nullable=False)
-    bag_image_url = Column(Text, nullable=False)
+    bag_image_url = Column(Text, nullable=True)
     bag_count = Column(Integer, nullable=False)
     inspected_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)

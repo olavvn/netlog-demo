@@ -104,26 +104,26 @@ def setup_dummy_data():
         # 5. inspection_record 생성 (site_bag_queue가 트리거에 의해 자동 생성됨)
         # 10일 전 입고: 25개
         db.execute(text("""
-            INSERT INTO inspection_record (site_id, vessel_id, bag_image_url, bag_count, inspected_at)
-            VALUES (:site_id, :vessel_id, 'http://dummy-image-url/1.png', 25, now() - interval '10 days')
+            INSERT INTO inspection_record (site_id, vessel_id, bag_count, inspected_at)
+            VALUES (:site_id, :vessel_id, 25, now() - interval '10 days')
         """), {"site_id": site_id_1, "vessel_id": vessel_id})
 
         # 8일 전 입고: 40개
         db.execute(text("""
-            INSERT INTO inspection_record (site_id, vessel_id, bag_image_url, bag_count, inspected_at)
-            VALUES (:site_id, :vessel_id, 'http://dummy-image-url/2.png', 40, now() - interval '8 days')
+            INSERT INTO inspection_record (site_id, vessel_id, bag_count, inspected_at)
+            VALUES (:site_id, :vessel_id, 40, now() - interval '8 days')
         """), {"site_id": site_id_2, "vessel_id": vessel_id})
 
         # 5일 전 입고: 35개
         db.execute(text("""
-            INSERT INTO inspection_record (site_id, vessel_id, bag_image_url, bag_count, inspected_at)
-            VALUES (:site_id, :vessel_id, 'http://dummy-image-url/3.png', 35, now() - interval '5 days')
+            INSERT INTO inspection_record (site_id, vessel_id, bag_count, inspected_at)
+            VALUES (:site_id, :vessel_id, 35, now() - interval '5 days')
         """), {"site_id": site_id_1, "vessel_id": vessel_id})
 
         # 2일 전 입고: 20개
         db.execute(text("""
-            INSERT INTO inspection_record (site_id, vessel_id, bag_image_url, bag_count, inspected_at)
-            VALUES (:site_id, :vessel_id, 'http://dummy-image-url/4.png', 20, now() - interval '2 days')
+            INSERT INTO inspection_record (site_id, vessel_id, bag_count, inspected_at)
+            VALUES (:site_id, :vessel_id, 20, now() - interval '2 days')
         """), {"site_id": site_id_2, "vessel_id": vessel_id})
 
         # 6. 첫 번째 과거 수거 계획 수립 및 완료 처리 (10일 전 계획, 8일 전 완료)
@@ -203,8 +203,8 @@ def setup_dummy_data():
         # 8. 현재 진행 중인 수거계획 생성 (dashboard 확인용)
         # 큐 추가입고 (오늘)
         db.execute(text("""
-            INSERT INTO inspection_record (site_id, vessel_id, bag_image_url, bag_count, inspected_at)
-            VALUES (:site_id, :vessel_id, 'http://dummy-image-url/5.png', 15, now())
+            INSERT INTO inspection_record (site_id, vessel_id, bag_count, inspected_at)
+            VALUES (:site_id, :vessel_id, 15, now())
         """), {"site_id": site_id_1, "vessel_id": vessel_id})
 
         current_collection_id = db.execute(text("""

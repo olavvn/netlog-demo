@@ -39,8 +39,8 @@ STATUS_COLORS = {
     "대기중":   "757575",
 }
 
-# 엑셀 헤더 행 레이블 (A~H열 순서)
-HEADERS = ["검수일시", "집하장명", "선박명", "마대 수량 (자루)", "수거 완료 여부", "잔여 마대 수", "이미지 URL", "검수 ID"]
+# 엑셀 헤더 행 레이블 (A~G열 순서)
+HEADERS = ["검수일시", "집하장명", "선박명", "마대 수량 (자루)", "수거 완료 여부", "잔여 마대 수", "검수 ID"]
 
 
 def _fmt_dt(dt) -> str:
@@ -109,7 +109,6 @@ def _get_inspection_records_for_export(db, site_id: str, start_date: date, end_d
                 ir.record_id,
                 ir.inspected_at,
                 ir.bag_count,
-                ir.bag_image_url,
                 s.name  AS site_name,
                 v.name  AS vessel_name,
                 q.is_fully_collected,
@@ -181,24 +180,12 @@ def generate_inspection_excel(db, site_id: str, start_date: date, end_date: date
         status_cell.font  = Font(color=STATUS_COLORS.get(status, "000000"))
 
         ws.cell(row=row_num, column=6).value = remaining                     # F: 잔여 마대 수
-
-        # G: 이미지 URL — 클릭 가능한 하이퍼링크로 표시 ("이미지 보기" 텍스트)
-        image_cell = ws.cell(row=row_num, column=7)
-        if row["bag_image_url"]:
-            image_cell.value     = "이미지 보기"
-            image_cell.hyperlink = row["bag_image_url"]
-            image_cell.font      = Font(color="1565C0", underline="single")
-
-        ws.cell(row=row_num, column=8).value = str(row["record_id"])         # H: 검수 ID (UUID)
+        ws.cell(row=row_num, column=7).value = str(row["record_id"])         # G: 검수 ID (UUID)
 
         # 홀수 데이터 행(5, 7, 9...)에 연한 파란 배경을 적용하여 줄무늬 효과
         if row_num % 2 == 1:
             for col_idx in range(1, len(HEADERS) + 1):
-                cell = ws.cell(row=row_num, column=col_idx)
-                if col_idx != 5 and col_idx != 7:  # 상태/하이퍼링크 셀은 font가 별도 지정되므로 fill만 적용
-                    cell.fill = ROW_EVEN_FILL
-                elif col_idx == 5:
-                    cell.fill = ROW_EVEN_FILL
+                ws.cell(row=row_num, column=col_idx).fill = ROW_EVEN_FILL
 
         # 모든 데이터 셀에 얇은 테두리 적용
         for col_idx in range(1, len(HEADERS) + 1):

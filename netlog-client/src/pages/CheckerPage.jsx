@@ -1,19 +1,16 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../api/axiosInstance'
 import Calendar from 'react-calendar'
 // import 'react-calendar/dist/Calendar.css'
 import checkIcon from '../assets/check_icon.png'
 import logo from '../assets/logo_small.png'
-import camera from '../assets/cam.png'
-import camera1 from '../assets/cam1.png'
 import toggle from '../assets/toggle.png'
 import extract_button from '../assets/extract_button.png'
 import no_file from '../assets/no_file.png'
 
 export default function CheckerPage() {
   const navigate = useNavigate()
-  const fileInputRef = useRef(null)
 
   const siteName = localStorage.getItem('site_name') || ''
   const siteCode = localStorage.getItem('site_code') || ''
@@ -24,8 +21,6 @@ export default function CheckerPage() {
   const [vesselName, setVesselName] = useState('')
   const [vesselConfirmed, setVesselConfirmed] = useState(false)
   const [bagCount, setBagCount] = useState(0)
-  const [image, setImage] = useState(null)
-  const [imagePreview, setImagePreview] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -43,7 +38,7 @@ export default function CheckerPage() {
   // 엑셀 추출
   // const [exporting, setExporting] = useState(false)
 
-  const isReady = vesselConfirmed && image && bagCount > 0
+  const isReady = vesselConfirmed && bagCount > 0
 
   const fetchFilteredData = async (vesselList, dates) => {
     const params = {}
@@ -91,17 +86,8 @@ export default function CheckerPage() {
     navigate('/checker/login')  // 랜딩 페이지 대신 검수자 로그인이 나을 듯
   }
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setImage(file)
-      setImagePreview(URL.createObjectURL(file))
-    }
-  }
-
   const handleSubmit = async () => {
     if (!vesselConfirmed) { setError('선박명을 확인해주세요'); return }
-    if (!image) { setError('사진을 촬영해주세요'); return }
     if (bagCount <= 0) { setError('마대자루 개수를 입력해주세요'); return }
     setLoading(true)
     setError('')
@@ -109,7 +95,6 @@ export default function CheckerPage() {
       const formData = new FormData()
       formData.append('vessel_name', vesselName)
       formData.append('bag_count', bagCount)
-      formData.append('image', image)
       const res = await axiosInstance.post('/inspection/record', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
@@ -246,52 +231,10 @@ export default function CheckerPage() {
               </div>
             </div>
 
-            {/* 2. 수거 사진 촬영 */}
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-lg bg-blue-500 text-white text-sm font-bold flex items-center justify-center">2</span>
-                  <span className="font-semibold text-gray-800">수거 사진 촬영</span>
-                </div>
-                {image && (
-                  <span className="text-green-500 text-sm font-medium bg-green-50 px-2 py-0.5 rounded-full">✓ 완료</span>
-                )}
-              </div>
-              <div className="bg-[#FFFBEB] px-5 py-2.5 flex items-center gap-2">
-                <span className="text-[#92400E] text-sm">⚠︎</span>
-                <span className="text-[#92400E] text-sm font-medium">마대 자루가 모두 보이게 찍어주세요.</span>
-              </div>
-              <div
-                className="relative w-full h-52 bg-blue-50 flex flex-col items-center justify-center overflow-hidden cursor-pointer"
-                onClick={() => fileInputRef.current.click()}
-              >
-                {imagePreview ? (
-                  <img src={imagePreview} className="w-full h-full object-cover" alt="preview" />
-                ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-                      <img src={camera} alt="" className="w-6 h-6 object-contain" />
-                    </div>
-                    <p className="text-blue-500 font-semibold text-sm">사진 촬영</p>
-                    <p className="text-gray-400 text-xs">탭하여 카메라 열기 또는 사진 선택</p>
-                  </div>
-                )}
-                {image && (
-                  <button
-                    className="absolute right-4 bottom-4 flex items-center gap-1 bg-[#4B4A4A] text-white text-sm px-3 py-1.5 rounded-xl"
-                    onClick={(e) => { e.stopPropagation(); fileInputRef.current.click() }}
-                  >
-                    <img src={camera1} alt="" className="w-5 h-5 object-contain" />재촬영
-                  </button>
-                )}
-              </div>
-              <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImageChange} />
-            </div>
-
-            {/* 3. 마대자루 개수 */}
+            {/* 2. 마대자루 개수 */}
             <div className="bg-white rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
-                <span className="w-7 h-7 rounded-lg bg-blue-500 text-white text-sm font-bold flex items-center justify-center">3</span>
+                <span className="w-7 h-7 rounded-lg bg-blue-500 text-white text-sm font-bold flex items-center justify-center">2</span>
                 <span className="font-semibold text-gray-800">마대자루 개수 입력</span>
               </div>
               <p className="text-center text-gray-400 text-sm mb-4">수거한 마대자루 수를 입력해 주세요</p>
@@ -455,14 +398,6 @@ export default function CheckerPage() {
                               minute: '2-digit'
                             })}
                           </p>
-                          {item.bag_image_url && (
-                            <img
-                              src={item.bag_image_url}
-                              alt="마대 사진"
-                              className="w-full rounded-xl object-cover"
-                              style={{ maxHeight: '240px' }}
-                            />
-                          )}
                         </div>
                       )}
                     </div>

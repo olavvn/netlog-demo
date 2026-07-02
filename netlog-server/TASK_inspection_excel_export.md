@@ -1,6 +1,6 @@
 # 작업지시서: 검수자용 검수 기록 Excel Export 기능
 
-> **대상 프로젝트**: `netlog-server` (FastAPI + PostgreSQL on Railway)
+> **대상 프로젝트**: `netlog-server` (FastAPI + PostgreSQL)
 > **작업 목적**: 집하장 검수자가 자신의 집하장에 기록된 검수 내역을 기간을 지정하여 `.xlsx` 파일로 다운로드
 > **작업 범위**: 신규 파일 1개 생성 + 기존 파일 1개 수정
 
@@ -34,7 +34,7 @@ inspection_record (
     record_id     UUID        -- PK
     site_id       UUID        -- FK → site (집하장)
     vessel_id     UUID        -- FK → vessel (선박)
-    bag_image_url TEXT        -- Cloudinary 이미지 URL
+    bag_image_url TEXT        -- (사진 업로드 기능 폐지로 미사용, 항상 NULL)
     bag_count     INT         -- 검수된 마대자루 수량
     inspected_at  TIMESTAMPTZ -- 검수 일시
 )

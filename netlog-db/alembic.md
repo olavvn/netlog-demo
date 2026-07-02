@@ -62,13 +62,13 @@ pip install -r "requirements.txt"
 접속 정보는 팀 노션 또는 팀장에게 문의.
 
 ```bash
-cp .env.example .env
+touch .env
 ```
 
 `.env` 내용:
 
 ```env
-DATABASE_URL=postgresql://유저명:비밀번호@호스트:포트/railway
+DATABASE_URL=postgresql://유저명:비밀번호@호스트:포트/DB이름
 ```
 
 ### 5. 현재 DB 상태 확인
