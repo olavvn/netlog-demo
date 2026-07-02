@@ -15,6 +15,7 @@ services:
   migrate:
     build:
       context: ./netlog_db_v1
+      dockerfile: Containerfile
     env_file:
       - ./netlog_db_v1/.env
     depends_on:
@@ -24,6 +25,7 @@ services:
   server:
     build:
       context: ./netlog-server
+      dockerfile: Containerfile
     restart: unless-stopped
     env_file:
       - ./netlog-server/.env
@@ -38,6 +40,7 @@ services:
   client:
     build:
       context: ./netlog-client
+      dockerfile: Containerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
     restart: unless-stopped
